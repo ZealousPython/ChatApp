@@ -13,12 +13,13 @@
     // 'USERS' Table: user_id primaryKey, user_name String, password String,
     // 'ChatSessions': session_id INT primaryKey, user_id_one INT, user_id_two INT
     //
-    public function createUser(): void
-    {
         $request_body = file_get_contents('php://input');
         $data = json_decode($request_body, true);
-        $item = $data['item'];
-        echo(json_encode($item));
+
+
+        $item = $data['somedata']; // Works!
+        //$item = $_POST['somedata'];
+        echo(json_encode(array("somedata" => $item)));
          // Works!
-    }
+    
 ?>
