@@ -6,6 +6,7 @@
  */
 import axios from "axios";
 import React from 'react';
+import Login from './screens/login'
 //import type {} from 'react';
 import {
   SafeAreaView,
@@ -19,7 +20,7 @@ import {
 
 
 
-export default class App extends React.Component{
+export default class App extends React.Component <any,any>{
   constructor(props: {}){
     super(props);
     this.state = {
@@ -50,7 +51,7 @@ export default class App extends React.Component{
   render(){
     return (
     <View>
-      {this.makeText()}
+      <Login></Login>
     </View>
     );
   }
