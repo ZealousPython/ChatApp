@@ -39,7 +39,7 @@ export default class Login extends React.Component <any,any>{
           const config = {
             method: 'post',
             data: data,
-            url: 'http://localhost:0080/ChatApp/index.php',
+            url: 'http://192.168.35.166/ChatApp/index.php',
           };
           axios(config).then(res=>{
             console.log(res.data.requestType)

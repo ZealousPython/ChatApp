@@ -29,7 +29,7 @@ export default class App extends React.Component <any,any>{
   }
   componentDidMount(): void {
     let data = {
-      somedata:"HELLO WORLD!!!!",
+      requestType:"HELLO WORLD!!!!",
       username:"Hello",
       password:"world",
     }
@@ -39,8 +39,8 @@ export default class App extends React.Component <any,any>{
       url: 'http://192.168.35.166/ChatApp/index.php',
     };
     axios(config).then(res=>{
-      console.log(res.data.somedata)
-      this.setState({text:res.data.somedata})
+      console.log(res.data.requestType)
+      this.setState({text:res.data.requestType})
     }).catch( (error) => {
       console.log(error);
     });
