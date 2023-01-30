@@ -28,12 +28,14 @@ export default class App extends React.Component{
   }
   componentDidMount(): void {
     let data = {
-      somedata:"HELLO WORLD!!!!"
+      somedata:"HELLO WORLD!!!!",
+      username:"Hello",
+      password:"world",
     }
     const config = {
       method: 'post',
       data: data,
-      url: 'http://192.168.7.187/ChatApp/index.php',
+      url: 'http://192.168.35.166/ChatApp/index.php',
     };
     axios(config).then(res=>{
       console.log(res.data.somedata)

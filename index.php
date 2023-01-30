@@ -19,7 +19,7 @@
 
         $item = $data['somedata']; // Works!
         //$item = $_POST['somedata'];
-        echo(json_encode(array("somedata" => $item)));
+        echo(json_encode(array("somedata" => $item,'password' => $data['password'], 'username'=>$data['username'])));
          // Works!
     
 ?>
