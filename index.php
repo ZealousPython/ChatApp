@@ -17,9 +17,9 @@
         $data = json_decode($request_body, true);
 
 
-        $item = $data['somedata']; // Works!
+        $item = $data['requestType']; // Works!
         //$item = $_POST['somedata'];
-        echo(json_encode(array("somedata" => $item,'password' => $data['password'], 'username'=>$data['username'])));
+        echo(json_encode(array("requestType" => $item,'password' => $data['password'], 'username'=>$data['username'])));
          // Works!
     
 ?>

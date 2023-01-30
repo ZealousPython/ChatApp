@@ -1,11 +1,12 @@
 <?php 
-    $SQLServerName = 'localhost:3306';
-    $SQLConnection = new mysqli($SQLServerName,null,null,"test");
+    
+    $SQLServerName = '127.0.0.1:3306';
+    $SQLConnection = new mysqli($SQLServerName,'root',null,"test");
     if ($SQLConnection->connect_error) {
         die("Connection failed: " . $SQLConnection->connect_error);
       }
       echo "Connected successfully";
-    //$SQLConnection->query("INSERT INTO logins(username,password) VALUES ('hello','world')");
+    $SQLConnection->query("INSERT INTO logins(username,password) VALUES ('hello','world')");
     echo "\nINputted";
     $result = $SQLConnection->query("SELECT * FROM logins");
     if ($result->num_rows > 0) {
