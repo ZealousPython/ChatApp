@@ -16,7 +16,7 @@ import {
     Text,
     TextInput,
     View,
-    TouchableHighlight,
+    Pressable,
     Dimensions,} 
 from 'react-native';
 
@@ -26,8 +26,8 @@ export default class Login extends React.Component <any,any>{
     constructor(props: {}){
         super(props);
         this.state = {
-            password:"",
-            username:"",
+            password:"hello",
+            username:"password",
         }
     }
     submit(){
@@ -39,11 +39,10 @@ export default class Login extends React.Component <any,any>{
           const config = {
             method: 'post',
             data: data,
-            url: 'http://192.168.35.166/ChatApp/acountlogin.php',
+            url: 'http://localhost:0080/ChatApp/index.php',
           };
           axios(config).then(res=>{
-            console.log(res.data.somedata)
-            this.setState({text:res.data.somedata})
+            console.log(res.data.requestType)
           }).catch( (error) => {
             console.log(error);
           });
@@ -52,6 +51,9 @@ export default class Login extends React.Component <any,any>{
     render(){
         return (
             <View>
+                <Pressable onPress={()=>this.submit()}>
+                    <Text style={{fontSize:40}}>Submit</Text>
+                </Pressable>
             </View>
         );
     }
