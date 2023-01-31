@@ -15,11 +15,13 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableHighlight,} from 'react-native';
+  TouchableHighlight,
+Dimensions,} from 'react-native';
 
 
 
-
+let screenHeight = Dimensions.get('window').height;
+let screenWidth = Dimensions.get('window').width;
 export default class App extends React.Component <any,any>{
   constructor(props: {}){
     super(props);
@@ -28,51 +30,24 @@ export default class App extends React.Component <any,any>{
     }
   }
   componentDidMount(): void {
-    let data = {
-      requestType:"HELLO WORLD!!!!",
-      username:"Hello",
-      password:"world",
-    }
-    const config = {
-      method: 'post',
-      data: data,
-      url: 'http://192.168.35.166/ChatApp/index.php',
-    };
-    axios(config).then(res=>{
-      console.log(res.data.requestType)
-      this.setState({text:res.data.requestType})
-    }).catch( (error) => {
-      console.log(error);
-    });
+    
   }
   makeText(){
     return (<Text>{this.state.text}</Text>);
   }
   render(){
     return (
-    <View>
+    <SafeAreaView style={styles.mainContainer}>
       <Login></Login>
-    </View>
+    </SafeAreaView>
     );
   }
 
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  mainContainer: {
+    flex:1,
+    backgroundColor:"black"
   },
 });
