@@ -4,9 +4,11 @@
  *
  * @format
  */
-import axios from "axios";
+import axios from 'axios';
 import React from 'react';
-import Login from './screens/login'
+import Login from './screens/login';
+import MainWindow from './screens/mainWindow';
+import * as Keychain from 'react-native-keychain';
 //import type {} from 'react';
 import {
   SafeAreaView,
@@ -16,38 +18,52 @@ import {
   Text,
   View,
   TouchableHighlight,
-Dimensions,} from 'react-native';
-
-
+  Dimensions,
+} from 'react-native';
 
 let screenHeight = Dimensions.get('window').height;
 let screenWidth = Dimensions.get('window').width;
-export default class App extends React.Component <any,any>{
-  constructor(props: {}){
+export default class App extends React.Component<any, any> {
+  constructor(props: {}) {
     super(props);
     this.state = {
-      text:"",
+      uesrAccount: null,
+    };
+  }
+  async componentDidMount() {
+    let credential = await Keychain.getGenericPassword();
+    if (credential) {
+      //this.setState({userAccount: JSON.parse(credential.password)});
     }
   }
-  componentDidMount(): void {
-    
+  onLogin(account: object) {
+    Keychain.setGenericPassword('session', JSON.stringify(account));
+    this.setState({userAccount: account});
   }
-  makeText(){
-    return (<Text>{this.state.text}</Text>);
+  makeLogin() {
+    if (this.state.userAccount == null) {
+      return (
+        <Login
+          onSubmit={(account: object) => {
+            this.onLogin(account);
+          }}></Login>
+      );
+    } else {
+      return <MainWindow account={this.state.userAccount}></MainWindow>;
+    }
   }
-  render(){
+  render() {
     return (
-    <SafeAreaView style={styles.mainContainer}>
-      <Login></Login>
-    </SafeAreaView>
+      <SafeAreaView style={styles.mainContainer}>
+        {this.makeLogin()}
+      </SafeAreaView>
     );
   }
-
 }
 
 const styles = StyleSheet.create({
   mainContainer: {
-    flex:1,
-    backgroundColor:"black"
+    flex: 1,
+    backgroundColor: 'black',
   },
 });
