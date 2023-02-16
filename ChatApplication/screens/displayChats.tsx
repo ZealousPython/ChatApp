@@ -22,6 +22,7 @@ import {
 
 import Chat from './chat';
 import Session from './sessions';
+import settings from '../settings.json';
 let screenHeight = Dimensions.get('window').height;
 let screenWidth = Dimensions.get('window').width;
 
@@ -47,7 +48,7 @@ export default class MainWindow extends React.Component<any, any> {
     const config = {
       method: 'post',
       data: data,
-      url: 'http://192.168.144.166/ChatApp/sessions.php',
+      url: 'http://' + settings.serverAddress + '/ChatApp/sessions.php',
     };
     axios(config)
       .then(res => {
@@ -65,12 +66,27 @@ export default class MainWindow extends React.Component<any, any> {
         console.log(error);
       });
   }
+  backPressed() {
+    if (this.state.hasActiveSession) {
+      this.exitChat();
+    }
+  }
   enterChat(session: any) {
     this.setState({
       hasActiveSession: true,
       activeSessionID: session.session_id,
     });
+    this.props.chatEntered(session.session_name);
   }
+
+  exitChat() {
+    this.setState({
+      hasActiveSession: false,
+      activeSessionID: -1,
+    });
+    this.props.chatExited();
+  }
+  addSession() {}
   renderChats() {
     if (this.state.foundUserSessions) {
       return (
@@ -82,6 +98,7 @@ export default class MainWindow extends React.Component<any, any> {
               key={index}
             />
           ))}
+          <Pressable onPress={() => this.addSession()}></Pressable>
         </ScrollView>
       );
     }

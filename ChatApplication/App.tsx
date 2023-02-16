@@ -9,6 +9,7 @@ import React from 'react';
 import Login from './screens/login';
 import MainWindow from './screens/mainWindow';
 import * as Keychain from 'react-native-keychain';
+import settings from './settings.json';
 //import type {} from 'react';
 import {
   SafeAreaView,
@@ -19,6 +20,8 @@ import {
   View,
   TouchableHighlight,
   Dimensions,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 
 let screenHeight = Dimensions.get('window').height;
@@ -54,9 +57,11 @@ export default class App extends React.Component<any, any> {
   }
   render() {
     return (
-      <SafeAreaView style={styles.mainContainer}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.mainContainer}>
         {this.makeLogin()}
-      </SafeAreaView>
+      </KeyboardAvoidingView>
     );
   }
 }

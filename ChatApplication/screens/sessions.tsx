@@ -7,7 +7,7 @@
 import axios from 'axios';
 import React from 'react';
 //import type {} from 'react';
-
+import settings from '../settings.json';
 import {
   SafeAreaView,
   ScrollView,

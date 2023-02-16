@@ -6,6 +6,7 @@
  */
 import axios from 'axios';
 import React from 'react';
+import settings from '../settings.json';
 //import type {} from 'react';
 
 import {
@@ -100,7 +101,7 @@ export default class Login extends React.Component<any, any> {
     const config = {
       method: 'post',
       data: data,
-      url: 'http://192.168.144.166/ChatApp/account.php',
+      url: 'http://' + settings.serverAddress + '/ChatApp/account.php',
     };
     axios(config)
       .then(res => {
@@ -114,7 +115,7 @@ export default class Login extends React.Component<any, any> {
         }
       })
       .catch(error => {
-        console.log(error);
+        console.log(error, 'error');
       });
   }
 

@@ -28,8 +28,8 @@ const lightColor = '#333344';
 const darkColor = '#222233';
 const lighterColor = '#444455';
 const textColor = '#AAAFBB';
-export default class MainWindow extends React.Component<any, any> {
-  constructor(props: any) {
+export default class MainWindow extends React.Component {
+  constructor(props) {
     super(props);
     this.state = {
       account: props.account,
@@ -41,14 +41,43 @@ export default class MainWindow extends React.Component<any, any> {
         settingsBackground: {backgroundColor: lightColor},
       }),
     };
+    this.chatWindow = React.createRef();
     console.log(props.account, 'MainWindowAccount');
   }
   mainContent() {
     if (this.state.activeScreen == 'chats') {
-      return <Chats account={this.state.account}></Chats>;
+      return (
+        <Chats
+          chatEntered={sessionName =>
+            this.setState({backup: true, titleText: sessionName})
+          }
+          chatExited={() => this.setState({backup: false, titleText: 'Chats'})}
+          ref={this.chatWindow}
+          account={this.state.account}></Chats>
+      );
     }
     return <></>;
   }
+  onBack() {
+    this.chatWindow.current.backPressed();
+  }
+  switchScreen(screen) {
+    if (screen != this.state.activeScreen) {
+      this.setState({
+        activeScreen: screen,
+        navStyles: StyleSheet.create({
+          chatBackground: {
+            backgroundColor: screen == 'chats' ? lighterColor : lightColor,
+          },
+          settingsBackground: {
+            backgroundColor: screen == 'settings' ? lighterColor : lightColor,
+          },
+        }),
+        titleText: screen == 'chats' ? 'Chats' : 'Settings',
+      });
+    }
+  }
+
   render() {
     return (
       <View style={styles.mainContainer}>
@@ -57,11 +86,12 @@ export default class MainWindow extends React.Component<any, any> {
             style={[
               {
                 flexDirection: 'row',
-                width: screenWidth / 5,
+                flex: 1,
                 marginTop: screenHeight / 60,
               },
               {display: this.state.backup ? 'flex' : 'none'},
-            ]}>
+            ]}
+            onPress={() => this.onBack()}>
             <FontAwesomeIcon icon={faChevronLeft} color={textColor} size={50} />
           </Pressable>
           <Text style={styles.titleText}>{this.state.titleText}</Text>
@@ -70,7 +100,8 @@ export default class MainWindow extends React.Component<any, any> {
 
         <View style={styles.navbar}>
           <Pressable
-            style={[styles.navChat, this.state.navStyles.chatBackground]}>
+            style={[styles.navChat, this.state.navStyles.chatBackground]}
+            onPress={() => this.switchScreen('chats')}>
             <FontAwesomeIcon
               style={styles.tabText}
               icon={faComments}
@@ -82,7 +113,8 @@ export default class MainWindow extends React.Component<any, any> {
             style={[
               styles.navSettings,
               this.state.navStyles.settingsBackground,
-            ]}>
+            ]}
+            onPress={() => this.switchScreen('settings')}>
             <FontAwesomeIcon
               style={styles.tabText}
               icon={faGears}
@@ -98,11 +130,12 @@ export default class MainWindow extends React.Component<any, any> {
 
 const styles = StyleSheet.create({
   mainContainer: {
-    flex: 1,
+    flex: 2,
     backgroundColor: darkColor,
   },
   mainContent: {
-    height: (screenHeight / 10) * 8.5,
+    flex: 17,
+    //height: (screenHeight / 10) * 8.5,
     width: screenWidth,
     backgroundColor: darkColor,
   },
@@ -118,7 +151,7 @@ const styles = StyleSheet.create({
     backgroundColor: lightColor,
   },
   navChat: {
-    height: screenHeight / 20,
+    flex: 1,
     width: screenWidth / 2,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -134,9 +167,11 @@ const styles = StyleSheet.create({
   titleText: {
     fontFamily: 'bold',
     fontSize: 42,
-    textAlign: 'left',
-    width: (screenWidth / 5) * 4,
+    alignSelf: 'center',
+    textAlign: 'center',
+    flex: 9,
     color: textColor,
+
     //paddingLeft: screenWidth / 7,
   },
   tabText: {
