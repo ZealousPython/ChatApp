@@ -20,6 +20,7 @@
     "react-native": "0.71.1",
     "react-native-image-picker": "^5.0.2",
     "react-native-keychain": "^8.1.1",
+    "react-native-popup-menu": "^0.16.1",
     "react-native-svg": "^13.8.0"
   },
   "devDependencies": {

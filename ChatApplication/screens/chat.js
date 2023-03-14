@@ -8,8 +8,13 @@ import axios from 'axios';
 import React, {useState} from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faImages} from '@fortawesome/free-regular-svg-icons';
-import {faGears, faChevronLeft} from '@fortawesome/free-solid-svg-icons';
+import {
+  faGears,
+  faChevronLeft,
+  faShareFromSquare,
+} from '@fortawesome/free-solid-svg-icons';
 import ImagePicker from 'react-native-image-picker';
+import settings from '../settings.json';
 //import type {} from 'react';
 
 import {
@@ -83,7 +88,7 @@ const ChatText = props => {
   const [height, setHeight] = useState(0);
   if (props.imageSource != null)
     Image.getSize(props.imageSource.uri, (Width, Height) => {
-      console.log(Height, Width, maxImageHeight, maxImageWidth);
+      //console.log(Height, Width, maxImageHeight, maxImageWidth);
       let newHeight = Height;
       let newWidth = Width;
       let tooTall = maxImageHeight * (Width / Height) > maxImageWidth;
@@ -122,51 +127,7 @@ export default class Chat extends React.Component {
       sessionID: props.sessionID,
       userID: props.userID,
       linesBatchSize: 50,
-      lines: [
-        {
-          image: {
-            uri: 'http://192.168.144.166/ChatApp/StoredFiles/ChatLogs/ChatImages/Lucca2.png',
-          },
-          message: '',
-          time: '8:23',
-          id: 0,
-          thisUser: false,
-        },
-        {
-          image: {
-            uri: 'http://192.168.144.166/ChatApp/StoredFiles/ChatLogs/ChatImages/Lucca2.png',
-          },
-          message: '',
-          time: '8:23',
-          id: 3,
-          thisUser: false,
-        },
-        {
-          image: {
-            uri: 'http://192.168.144.166/ChatApp/StoredFiles/ChatLogs/ChatImages/Lucca2.png',
-          },
-          message: '',
-          time: '8:23',
-          id: 2,
-          thisUser: true,
-        },
-        {
-          image: {
-            uri: 'http://192.168.144.166/ChatApp/StoredFiles/ChatLogs/ChatImages/Lucca2.png',
-          },
-          message: '',
-          time: '8:23',
-          id: 4,
-          thisUser: false,
-        },
-        {
-          image: null,
-          message: 'Hello World',
-          time: '8:23',
-          id: 1,
-          thisUser: true,
-        },
-      ],
+      lines: [],
       addingLines: false,
       message: '',
       messageImage: null,
@@ -179,7 +140,9 @@ export default class Chat extends React.Component {
   }
 
   async addLines() {
+    console.log('ADD');
     if (!this.state.addingLines) {
+      console.log('ADD2');
       this.setState({addingLines: true});
       let data = {
         requestType: 'retriveData',
@@ -188,16 +151,20 @@ export default class Chat extends React.Component {
         linesRead: this.state.lines.length,
         linesToRead: this.state.linesBatchSize,
       };
+      console.log(this.state.lines.length);
       const config = {
         method: 'post',
         data: data,
-        url: 'http://192.168.144.166/ChatApp/chat.php',
+        url: 'http://' + settings.serverAddress + '/ChatApp/chat.php',
       };
       const result = await axios(config)
         .then(res => {
           if (res.data.success) {
+            console.log(res.data.image);
+            this.setState({lines: [...this.state.lines, ...res.data.messages]});
           } else {
-            console.log(res.data.err);
+            console.log('error');
+            console.log(res.data.dat);
           }
         })
         .catch(error => {
@@ -206,12 +173,19 @@ export default class Chat extends React.Component {
       this.setState({addingLines: false});
     }
   }
+  async sendMessage() {
+    await this.setState({lines: []});
+    await this.addLines();
+  }
+  componentDidMount() {
+    this.addLines();
+  }
   render() {
     return (
       <View style={styles.mainContainer}>
         <FlatList
           style={styles.chatView}
-          inverted={false}
+          inverted={true}
           data={this.state.lines}
           onEndReached={() => this.addLines()}
           renderItem={({item}) => {
@@ -227,19 +201,31 @@ export default class Chat extends React.Component {
           keyExtractor={item => item.id}
         />
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.textInputBar}>
-            <TextInput
-              style={[styles.textInput]}
-              selectTextOnFocus={true}
-              autoCorrect={false}
-              onChangeText={text => this.setState({message: text})}
-              placeholder={'message '}
-              placeholderTextColor="#AAAFBBBB"
-            />
-            <Pressable style={[styles.imageButton]}>
+          <View style={styles.inputBar}>
+            <View style={styles.textInputBar}>
+              <TextInput
+                style={[styles.textInput]}
+                selectTextOnFocus={true}
+                autoCorrect={false}
+                onChangeText={text => this.setState({message: text})}
+                placeholder={'message '}
+                placeholderTextColor="#AAAFBBBB"
+              />
+              <Pressable style={[styles.imageButton]}>
+                <FontAwesomeIcon
+                  style={styles.tabText}
+                  icon={faImages}
+                  color={textColor}
+                  size={screenHeight / 19}
+                />
+              </Pressable>
+            </View>
+            <Pressable
+              style={[styles.submitButton]}
+              onPress={() => this.sendMessage()}>
               <FontAwesomeIcon
                 style={styles.tabText}
-                icon={faImages}
+                icon={faShareFromSquare}
                 color={textColor}
                 size={screenHeight / 19}
               />
@@ -266,26 +252,26 @@ const styles = StyleSheet.create({
   imageButton: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: screenWidth / 6,
+    flex: 2,
     backgroundColor: lightColor,
-    borderColor: '#AAAFBB',
-    borderWidth: 2,
+    borderColor: textColor,
+    borderBottomRightRadius: 20,
+    borderTopRightRadius: 20,
     fontSize: 20,
-    borderLeftWidth: 1,
+    borderLeftWidth: 3,
     borderRightWidth: 0,
   },
   textInput: {
-    flex: 1,
+    flex: 8,
     borderColor: '#AAAFBB',
-    borderWidth: 2,
     fontSize: 20,
-    borderLeftWidth: 0,
-    borderRightWidth: 0,
-
     color: '#AAAFBB',
   },
   textInputBar: {
-    width: screenWidth,
+    flex: 7,
+    borderWidth: 2,
+    borderColor: textColor,
+    borderRadius: 20,
     height: screenHeight / 10 - 4,
     flexDirection: 'row',
   },
@@ -308,5 +294,19 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
     padding: 10,
     alignItems: 'center',
+  },
+  inputBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  submitButton: {
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: screenHeight / 12 - 4,
+    width: screenHeight / 12 - 4,
+
+    backgroundColor: lighterColor,
+    borderRadius: 80,
   },
 });

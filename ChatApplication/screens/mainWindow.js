@@ -42,7 +42,6 @@ export default class MainWindow extends React.Component {
       }),
     };
     this.chatWindow = React.createRef();
-    console.log(props.account, 'MainWindowAccount');
   }
   mainContent() {
     if (this.state.activeScreen == 'chats') {

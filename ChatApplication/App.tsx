@@ -6,6 +6,7 @@
  */
 import axios from 'axios';
 import React from 'react';
+import {MenuProvider} from 'react-native-popup-menu';
 import Login from './screens/login';
 import MainWindow from './screens/mainWindow';
 import * as Keychain from 'react-native-keychain';
@@ -57,11 +58,13 @@ export default class App extends React.Component<any, any> {
   }
   render() {
     return (
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.mainContainer}>
-        {this.makeLogin()}
-      </KeyboardAvoidingView>
+      <MenuProvider>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.mainContainer}>
+          {this.makeLogin()}
+        </KeyboardAvoidingView>
+      </MenuProvider>
     );
   }
 }
