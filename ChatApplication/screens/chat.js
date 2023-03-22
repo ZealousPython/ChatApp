@@ -109,11 +109,13 @@ const ChatText = props => {
         props.currentUser ? chatStyles.rightChatView : chatStyles.leftChatView
       }>
       <Text style={chatStyles.text}>{props.text}</Text>
-      <ChatImage
-        height={height}
-        width={width}
-        imageSource={props.imageSource}
-      />
+      {props.imageSource != null && (
+        <ChatImage
+          height={height}
+          width={width}
+          imageSource={props.imageSource}
+        />
+      )}
 
       <Text style={chatStyles.smallText}>{props.timeStamp}</Text>
     </View>
@@ -133,6 +135,7 @@ export default class Chat extends React.Component {
       messageImage: null,
       keyBoardHeight: screenHeight / 3,
       keyboardShown: false,
+      sending: false,
     };
   }
   componentDidMount() {
@@ -140,9 +143,7 @@ export default class Chat extends React.Component {
   }
 
   async addLines() {
-    console.log('ADD');
     if (!this.state.addingLines) {
-      console.log('ADD2');
       this.setState({addingLines: true});
       let data = {
         requestType: 'retriveData',
@@ -151,7 +152,6 @@ export default class Chat extends React.Component {
         linesRead: this.state.lines.length,
         linesToRead: this.state.linesBatchSize,
       };
-      console.log(this.state.lines.length);
       const config = {
         method: 'post',
         data: data,
@@ -160,7 +160,6 @@ export default class Chat extends React.Component {
       const result = await axios(config)
         .then(res => {
           if (res.data.success) {
-            console.log(res.data.image);
             this.setState({lines: [...this.state.lines, ...res.data.messages]});
           } else {
             console.log('error');
@@ -174,11 +173,82 @@ export default class Chat extends React.Component {
     }
   }
   async sendMessage() {
-    await this.setState({lines: []});
-    await this.addLines();
+    if (!this.state.sending) {
+      let date = new Date();
+      let timeStamp =
+        date.getMonth() +
+        '/' +
+        date.getDate() +
+        '/' +
+        date.getFullYear() +
+        '/' +
+        (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) +
+        ':' +
+        (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes());
+      let message =
+        this.state.userID + ',' + timeStamp + ",'" + this.state.message + "'";
+      if (this.state.messageImage != null)
+        message += ",'" + this.state.messageImage + "'";
+      this.setState({sending: true});
+      let data = {
+        requestType: 'sendData',
+        message: message,
+        session_id: this.state.sessionID,
+      };
+      console.log(this.state.lines.length);
+      const config = {
+        method: 'post',
+        data: data,
+        url: 'http://' + settings.serverAddress + '/ChatApp/chat.php',
+      };
+      const result = await axios(config)
+        .then(res => {
+          if (res.data.success) {
+            this.setState({message: '', messageImage: null});
+            console.log('sent');
+          } else {
+            console.log('error');
+            console.log(res.data.dat);
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      this.setState({sending: false});
+      await this.setState({lines: []});
+      await this.addLines();
+    }
   }
   componentDidMount() {
     this.addLines();
+  }
+  textChanges(text) {
+    let urls = [];
+    if (text.includes('http://') || text.include('https://')) {
+      let url = '';
+      for (let i = 0; i < text.length; i++) {
+        if (
+          ('http://'.includes(url + text[i]) && url.length <= 6) ||
+          ('https://'.includes(url + text[i]) && url.length <= 7)
+        ) {
+          url += text[i];
+        } else if (
+          (url.length >= 7 && url.includes('http://')) ||
+          (url.length >= 8 && url.includes('https://'))
+        ) {
+          if (text[i] == ' ') {
+            urls.push(url);
+            url = '';
+          } else {
+            url += text[i];
+          }
+        }
+      }
+    }
+    urls.forEach(x => {
+      urls.r;
+    });
+    this.setState({message: text});
   }
   render() {
     return (
@@ -193,7 +263,7 @@ export default class Chat extends React.Component {
               <ChatText
                 imageSource={item.image}
                 text={item.message}
-                timeStamp={item.time}
+                timeStamp={item.timeStamp}
                 currentUser={item.thisUser}
               />
             );
@@ -207,18 +277,10 @@ export default class Chat extends React.Component {
                 style={[styles.textInput]}
                 selectTextOnFocus={true}
                 autoCorrect={false}
-                onChangeText={text => this.setState({message: text})}
+                onChangeText={text => this.textChanges(text)}
                 placeholder={'message '}
                 placeholderTextColor="#AAAFBBBB"
               />
-              <Pressable style={[styles.imageButton]}>
-                <FontAwesomeIcon
-                  style={styles.tabText}
-                  icon={faImages}
-                  color={textColor}
-                  size={screenHeight / 19}
-                />
-              </Pressable>
             </View>
             <Pressable
               style={[styles.submitButton]}
