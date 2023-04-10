@@ -28,6 +28,20 @@ function getSessionInfo($sessionID, $userID)
     $SQLConnection->close();
     return $SessionData;
 }
+function createSession($user1, $user2, $sessionName)
+{
+    $SQLServerName = '127.0.1.1:3306';
+    $SQLConnection = null;
+    try {
+        $SQLConnection = new mysqli($SQLServerName, 'root', null, "ChatApp");
+    } catch (Exception $e) {
+        die("Connection failed: " . $SQLConnection->connect_error);
+    }
+
+    !$SQLConnection->query("INSERT INTO chatsessions(user_id_one,user_id_two,session_name) VALUES ('" . $user1['account_id'] . "','" . $user2['account_id'] . "','" . $sessionName . "')");
+    $getSession = $SQLConnection->query("SELECT COUNT(1) FROM chatsessions");
+    fopen($getSession . ".txt", "w");
+}
 
 
 $request_body = file_get_contents('php://input');
@@ -49,6 +63,16 @@ if ($data != null) {
         }
         echo (json_encode(array('account' => $account, 'sessions' => $sessions, 'success' => true)));
     } else if ($data['requestType'] == 'CreateSession') {
+        $firstUser = $data['account'];
+        try {
+            $result = $SQLConnection->query("SELECT account_id, username, password FROM user_accounts WHERE username='" . $data['other_username'] . "'");
+            $secondUser = $result->fetch_assoc();
+
+            createSession($firstUser, $secondUser, $data['session_name']);
+            echo (json_encode(array('success' => true)));
+        } catch (Exception $e) {
+            echo (json_encode(array('success' => false, 'err' => 'Name Already Used or Incorrect Username' . $e)));
+        }
     } else {
         echo (json_encode(array('success' => false, 'err' => 'Invaild Request Type')));
     }

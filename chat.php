@@ -1,7 +1,7 @@
 <?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-//error_reporting(E_ALL);
+error_reporting(E_ALL);
 $SQLServerName = '127.0.1.1:3306';
 $ip = $_SERVER['SERVER_ADDR'];
 function parseChatData($msg)
@@ -40,40 +40,46 @@ function parseChatData($msg)
 $request_body = file_get_contents('php://input');
 $data = json_decode($request_body, true);
 //$data = array('requestType' => 'sendData', 'session_id' => 1, 'message' => "6,03/15/2023/9:12,'hello worlda'",);
+$data = array('requestType' => 'retriveData', '');
 $SQLConnection;
 
 if ($data != null) {
 
     if ($data['requestType'] == 'retriveData') {
-        $messages = array();
-        $textFile = fopen(getcwd() . "/StoredFiles/ChatLogs/" . $data['session_id'] . ".txt", "r");
-        for ($x = 0; $x < $data['linesRead']; $x++) {
-            if (feof($textFile)) break;
-            else {
-                fgets($textFile);
-            }
-        }
-        for ($x = 0; $x < $data['linesToRead']; $x++) {
-            if (feof($textFile)) break;
-            else {
-                $msgData = parseChatData(fgets($textFile));
-                if (isset($msgData[3]) && $msgData[3] != null) {
-                    $image = $msgData[3];
-                    $imageUri = array('uri' => 'http://' . $ip . "/ChatApp/StoredFiles/ChatLogs/ChatImages/" . $image);
-                } else {
-                    $imageUri = null;
+        try {
+            $messages = array();
+            $textFile = fopen(getcwd() . "/StoredFiles/ChatLogs/" . $data['session_id'] . ".txt", "r");
+            for ($x = 0; $x < $data['linesRead']; $x++) {
+                if (feof($textFile)) break;
+                else {
+                    fgets($textFile);
                 }
-                $formatedMsg = array("image" => $imageUri, "timeStamp" => $msgData[1], 'message' => $msgData[2], 'id' => $x + $data['linesRead'], 'thisUser' => $msgData[0] == $data['userID']);
-                $messages[] = $formatedMsg;
             }
+            for ($x = 0; $x < $data['linesToRead']; $x++) {
+                if (feof($textFile)) break;
+                else {
+                    $msgData = parseChatData(fgets($textFile));
+                    if (isset($msgData[3]) && $msgData[3] != null) {
+                        $image = $msgData[3];
+                        $imageUri = array('uri' => 'http://' . $ip . "/ChatApp/StoredFiles/ChatLogs/ChatImages/" . $image);
+                    } else {
+                        $imageUri = null;
+                    }
+                    $formatedMsg = array("image" => $imageUri, "timeStamp" => $msgData[1], 'message' => $msgData[2], 'id' => $x + $data['linesRead'], 'thisUser' => $msgData[0] == $data['userID']);
+                    $messages[] = $formatedMsg;
+                }
+            }
+
+            fclose($textFile);
+            echo (json_encode(array('messages' => $messages, 'success' => true)));
+        } catch (Exception $e) {
+            echo (json_encode(array('err' => 'Failed to retireve Messages: ' . $e, 'success' => false)));
         }
-        fclose($textFile);
-        echo (json_encode(array('messages' => $messages, 'success' => true)));
     } else if ($data['requestType'] == 'sendData') {
         $newText = $data['message'] . "\n" . file_get_contents(getcwd() . "/StoredFiles/ChatLogs/" . $data['session_id'] . ".txt");
         file_put_contents(getcwd() . "/StoredFiles/ChatLogs/" . $data['session_id'] . ".txt", $newText);
         echo (json_encode(array('success' => true)));
     } else {
-        echo (json_encode(array('success' => false, 'dat' => $data)));
+        echo (json_encode(array('success' => false, 'dat' => $data, 'err' => "bad requst type")));
     }
 }

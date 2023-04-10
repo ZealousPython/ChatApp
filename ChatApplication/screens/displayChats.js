@@ -81,6 +81,30 @@ export default class MainWindow extends React.Component {
         console.log(error);
       });
   }
+  creatUserSession() {
+    let data = {
+      requestType: 'CreateSession',
+      account: this.state.account,
+      other_username: this.state.addChatUsername,
+      session_name: this.state.addChatName,
+    };
+    const config = {
+      method: 'post',
+      data: data,
+      url: 'http://' + settings.serverAddress + '/ChatApp/sessions.php',
+    };
+    axios(config)
+      .then(res => {
+        if (res.data.success) {
+          this.getUserSessions();
+        } else {
+          console.log(res.data.err, 'error');
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
   backPressed() {
     if (this.state.hasActiveSession) {
       this.exitChat();
@@ -170,11 +194,7 @@ export default class MainWindow extends React.Component {
             <View style={styles.sessionMenu}>
               <MenuOption
                 style={styles.menuConfirm}
-                onSelect={() =>
-                  alert(
-                    `Chat Added ${this.state.addChatName}:${this.state.addChatUsername}`,
-                  )
-                }>
+                onSelect={() => this.creatUserSession()}>
                 <Text style={styles.menuText}>Add</Text>
               </MenuOption>
               <MenuOption

@@ -44,6 +44,10 @@ export default class App extends React.Component<any, any> {
     Keychain.setGenericPassword('session', JSON.stringify(account));
     this.setState({userAccount: account});
   }
+  onLogout() {
+    Keychain.setGenericPassword('session', JSON.stringify(null));
+    this.setState({userAccount: null});
+  }
   makeLogin() {
     if (this.state.userAccount == null) {
       return (

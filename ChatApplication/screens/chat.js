@@ -84,39 +84,12 @@ const ChatImage = props => {
   );
 };
 const ChatText = props => {
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
-  if (props.imageSource != null)
-    Image.getSize(props.imageSource.uri, (Width, Height) => {
-      //console.log(Height, Width, maxImageHeight, maxImageWidth);
-      let newHeight = Height;
-      let newWidth = Width;
-      let tooTall = maxImageHeight * (Width / Height) > maxImageWidth;
-      if (Height > Width && Height > maxImageHeight) {
-        newHeight = maxImageHeight;
-        newWidth = maxImageHeight * (Width / Height);
-      }
-      if ((Width >= Height && Width > maxImageWidth) || tooTall) {
-        newHeight = maxImageWidth * (Height / Width);
-        newWidth = maxImageWidth;
-      }
-      setWidth(newWidth);
-      setHeight(newHeight);
-    });
   return (
     <View
       style={
         props.currentUser ? chatStyles.rightChatView : chatStyles.leftChatView
       }>
       <Text style={chatStyles.text}>{props.text}</Text>
-      {props.imageSource != null && (
-        <ChatImage
-          height={height}
-          width={width}
-          imageSource={props.imageSource}
-        />
-      )}
-
       <Text style={chatStyles.smallText}>{props.timeStamp}</Text>
     </View>
   );
@@ -132,7 +105,7 @@ export default class Chat extends React.Component {
       lines: [],
       addingLines: false,
       message: '',
-      messageImage: null,
+
       keyBoardHeight: screenHeight / 3,
       keyboardShown: false,
       sending: false,
@@ -162,8 +135,7 @@ export default class Chat extends React.Component {
           if (res.data.success) {
             this.setState({lines: [...this.state.lines, ...res.data.messages]});
           } else {
-            console.log('error');
-            console.log(res.data.dat);
+            console.log('error: ', res.data.err);
           }
         })
         .catch(error => {
@@ -214,7 +186,7 @@ export default class Chat extends React.Component {
         .catch(error => {
           console.log(error);
         });
-      this.setState({sending: false});
+      this.setState({sending: false, message: ''});
       await this.setState({lines: []});
       await this.addLines();
     }
@@ -223,31 +195,6 @@ export default class Chat extends React.Component {
     this.addLines();
   }
   textChanges(text) {
-    let urls = [];
-    if (text.includes('http://') || text.include('https://')) {
-      let url = '';
-      for (let i = 0; i < text.length; i++) {
-        if (
-          ('http://'.includes(url + text[i]) && url.length <= 6) ||
-          ('https://'.includes(url + text[i]) && url.length <= 7)
-        ) {
-          url += text[i];
-        } else if (
-          (url.length >= 7 && url.includes('http://')) ||
-          (url.length >= 8 && url.includes('https://'))
-        ) {
-          if (text[i] == ' ') {
-            urls.push(url);
-            url = '';
-          } else {
-            url += text[i];
-          }
-        }
-      }
-    }
-    urls.forEach(x => {
-      urls.r;
-    });
     this.setState({message: text});
   }
   render() {
