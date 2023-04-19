@@ -37,7 +37,7 @@ export default class App extends React.Component<any, any> {
   async componentDidMount() {
     let credential = await Keychain.getGenericPassword();
     if (credential) {
-      //this.setState({userAccount: JSON.parse(credential.password)});
+      this.setState({userAccount: JSON.parse(credential.password)});
     }
   }
   onLogin(account: object) {
@@ -57,7 +57,11 @@ export default class App extends React.Component<any, any> {
           }}></Login>
       );
     } else {
-      return <MainWindow account={this.state.userAccount}></MainWindow>;
+      return (
+        <MainWindow
+          account={this.state.userAccount}
+          onLogout={() => this.onLogout()}></MainWindow>
+      );
     }
   }
   render() {

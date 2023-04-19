@@ -133,7 +133,7 @@ export default class Chat extends React.Component {
       const result = await axios(config)
         .then(res => {
           if (res.data.success) {
-            this.setState({lines: [...this.state.lines, ...res.data.messages]});
+            this.setState({lines: [...res.data.messages]});
           } else {
             console.log('error: ', res.data.err);
           }
@@ -191,6 +191,12 @@ export default class Chat extends React.Component {
       await this.addLines();
     }
   }
+  async refresh() {
+    if (!this.state.addingLines) {
+      await this.setState({lines: []});
+      await this.addLines();
+    }
+  }
   componentDidMount() {
     this.addLines();
   }
@@ -215,6 +221,8 @@ export default class Chat extends React.Component {
               />
             );
           }}
+          refreshing={this.state.addingLines}
+          onRefresh={() => this.refresh()}
           keyExtractor={item => item.id}
         />
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -224,6 +232,7 @@ export default class Chat extends React.Component {
                 style={[styles.textInput]}
                 selectTextOnFocus={true}
                 autoCorrect={false}
+                value={this.state.message}
                 onChangeText={text => this.textChanges(text)}
                 placeholder={'message '}
                 placeholderTextColor="#AAAFBBBB"
@@ -231,7 +240,9 @@ export default class Chat extends React.Component {
             </View>
             <Pressable
               style={[styles.submitButton]}
-              onPress={() => this.sendMessage()}>
+              onPress={() => {
+                this.sendMessage();
+              }}>
               <FontAwesomeIcon
                 style={styles.tabText}
                 icon={faShareFromSquare}

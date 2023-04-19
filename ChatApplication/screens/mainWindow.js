@@ -55,7 +55,29 @@ export default class MainWindow extends React.Component {
           account={this.state.account}></Chats>
       );
     }
-    return <></>;
+    return (
+      <View
+        style={{alignItems: 'center', flex: 1, paddingTop: screenHeight / 20}}>
+        <Pressable
+          style={{
+            backgroundColor: '#662222',
+            height: screenHeight / 10,
+            width: screenWidth / 3,
+            borderRadius: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={() => this.props.onLogout()}>
+          <Text
+            style={[
+              styles.tabText,
+              {justifyContent: 'center', textAlign: 'center'},
+            ]}>
+            Logout
+          </Text>
+        </Pressable>
+      </View>
+    );
   }
   onBack() {
     this.chatWindow.current.backPressed();

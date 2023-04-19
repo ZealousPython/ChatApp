@@ -81,7 +81,7 @@ export default class MainWindow extends React.Component {
         console.log(error);
       });
   }
-  creatUserSession() {
+  createUserSession() {
     let data = {
       requestType: 'CreateSession',
       account: this.state.account,
@@ -97,6 +97,7 @@ export default class MainWindow extends React.Component {
       .then(res => {
         if (res.data.success) {
           this.getUserSessions();
+          this.setState({popupOpen: false});
         } else {
           console.log(res.data.err, 'error');
         }
@@ -194,7 +195,7 @@ export default class MainWindow extends React.Component {
             <View style={styles.sessionMenu}>
               <MenuOption
                 style={styles.menuConfirm}
-                onSelect={() => this.creatUserSession()}>
+                onSelect={() => this.createUserSession()}>
                 <Text style={styles.menuText}>Add</Text>
               </MenuOption>
               <MenuOption
