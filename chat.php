@@ -40,7 +40,7 @@ function parseChatData($msg)
 $request_body = file_get_contents('php://input');
 $data = json_decode($request_body, true);
 //$data = array('requestType' => 'sendData', 'session_id' => 1, 'message' => "6,03/15/2023/9:12,'hello worlda'",);
-$data = array('requestType' => 'retriveData', '');
+//$data = array('requestType' => 'retriveData', 'linesRead' => 00, 'session_id' => 26, 'linesToRead' => 50, 'userID' => 7);
 $SQLConnection;
 
 if ($data != null) {
@@ -55,18 +55,20 @@ if ($data != null) {
                     fgets($textFile);
                 }
             }
-            for ($x = 0; $x < $data['linesToRead']; $x++) {
+            for ($x = 0; $x < $data['linesToRead']; $x--) {
                 if (feof($textFile)) break;
                 else {
                     $msgData = parseChatData(fgets($textFile));
-                    if (isset($msgData[3]) && $msgData[3] != null) {
-                        $image = $msgData[3];
-                        $imageUri = array('uri' => 'http://' . $ip . "/ChatApp/StoredFiles/ChatLogs/ChatImages/" . $image);
-                    } else {
-                        $imageUri = null;
+                    if (isset($msgData[1]) && $msgData[1] != null) {
+                        if (isset($msgData[3]) && $msgData[3] != null) {
+                            $image = $msgData[3];
+                            $imageUri = array('uri' => 'http://' . $ip . "/ChatApp/StoredFiles/ChatLogs/ChatImages/" . $image);
+                        } else {
+                            $imageUri = null;
+                        }
+                        $formatedMsg = array("image" => $imageUri, "timeStamp" => $msgData[1], 'message' => $msgData[2], 'id' => $x + $data['linesRead'], 'thisUser' => $msgData[0] == $data['userID']);
+                        $messages[] = $formatedMsg;
                     }
-                    $formatedMsg = array("image" => $imageUri, "timeStamp" => $msgData[1], 'message' => $msgData[2], 'id' => $x + $data['linesRead'], 'thisUser' => $msgData[0] == $data['userID']);
-                    $messages[] = $formatedMsg;
                 }
             }
 

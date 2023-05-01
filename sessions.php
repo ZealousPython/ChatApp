@@ -40,7 +40,6 @@ function createSession($user1, $user2, $sessionName)
 
     !$SQLConnection->query("INSERT INTO chatsessions(user_id_one,user_id_two,session_name) VALUES ('" . $user1['account_id'] . "','" . $user2['account_id'] . "','" . $sessionName . "')");
     $getSession = $SQLConnection->query("SELECT COUNT(1) FROM chatsessions");
-    fopen($getSession . ".txt", "w");
 }
 
 
